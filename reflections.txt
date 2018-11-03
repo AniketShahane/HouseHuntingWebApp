@@ -1,0 +1,50 @@
+### This is a house hunt project that we are creating  ###
+
+STEPS:
+
+-------------------------------------------------------------------------------
+
+1. The first Step is to get everything setup which we already know
+-> git initialization, virtual environment setup and django installation
+
+-------------------------------------------------------------------------------
+
+2. What is the best place to store the templates ???
+---> Inside the root directory ie. Where your manage.py resides
+---> After this we go into settings.py of our project folder and define the path of all the templates
+'''
+  (inside templates list)
+  DIRS: os.path.join(BASE_DIR, 'templates')
+'''
+*** This simply gives the path of the templates folder.. So whenever me make a render request django searches for that file inside of this templates folder....
+
+-------------------------------------------------------------------------------
+
+3. What is the best place to store the static files ???
+---> Inside the main project folder ie. Where wsgi.py resides we create the static folder
+---> After this we go into the settings.py of our main project
+'''
+STATIC_ROOT = os.join.path(BASE_DIR, 'static')
+STATICFILES_DIRS = [
+  os.join.path(BASE_DIR, 'HouseHunt/static')
+]
+STATIC_URL = '/static/'
+'''
+*** The static root just says that create a 'static' named folder in the base/root directory ie. where manage.py resides.
+*** The static files just says that look into the 'Project_folder/static' folder for the files when we run '''python manage.py collectstatic'''
+*** The static url just defines the url that the user should visit to look at these files
+*** Wherever we want to use static files we need to write '''{% load static %}'''
+*** To use the static files we need to write '''{% static 'file path inside of static' %}'''
+
+-------------------------------------------------------------------------------
+
+4. Now a good practice is the extend the elements like header and footer to other html files in out project so that we don't have to write the code again and again. But an even cleaner way of doing this is to make partials Eg. storing the code of the header in the folder templates/partials/_header.html
+&&& storing the code of the footer in the folder templates/partials/_footer.html
+--->
+'''
+(To include these partials into our base.html we just use this code)
+
+{% include 'partials/_topbar.html' %}
+{% include 'partials/_navbar.html' %}
+{% include 'partials/_footer.html' %}
+'''
