@@ -55,3 +55,20 @@ STATIC_URL = '/static/'
 -> This command simply creates the files for the models so that when we further run the '''python manage.py migrate''' it will update the database to have the tables for our models.
 
 -------------------------------------------------------------------------------
+
+6. If we want to change the styling of the admin page of django
+--> We first create an 'admin' folder inside the root templates directory and inside that we create a file 'base_site.html'
+--> Inside that we have to first extend
+'''
+{% extends 'admin/base.html' %}
+{% load static %}
+
+{% block brading %}
+  Change what we see on the top
+{% endblock %}
+
+{% block extrastyle %}
+  Add links to css files... <link href="{% static 'css/admin.css' %} rel='stylesheet'" >
+{% endblock %}
+'''
+---> To get the styling to appear the admin.css should be added inside the static folder of the main project and not the ***ROOT STATIC*** ie. where the wsgi.py is present.
