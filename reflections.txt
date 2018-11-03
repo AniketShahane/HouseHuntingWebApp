@@ -48,3 +48,10 @@ STATIC_URL = '/static/'
 {% include 'partials/_navbar.html' %}
 {% include 'partials/_footer.html' %}
 '''
+
+-------------------------------------------------------------------------------
+
+5. What does '''python manage.py makemigrations''' do ???
+-> This command simply creates the files for the models so that when we further run the '''python manage.py migrate''' it will update the database to have the tables for our models.
+
+-------------------------------------------------------------------------------
