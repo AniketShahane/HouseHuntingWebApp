@@ -72,3 +72,111 @@ STATIC_URL = '/static/'
 {% endblock %}
 '''
 ---> To get the styling to appear the admin.css should be added inside the static folder of the main project and not the ***ROOT STATIC*** ie. where the wsgi.py is present.
+
+-------------------------------------------------------------------------------
+
+7. If We want to customize the way the admin page lists all the things in our database we can add things to the admin.py of that app
+Eg. (inside the admin.py of the listings)
+class ListingAdmin(admin.ModelAdmin):
+  list_display = ('id', 'title', 'is_published', 'price', 'realtor')
+  #shows the following field when we click on listings
+  list_display_links = ('id', 'title')
+  #shows the edit page when we click on either id or title before this it was just id b/c it was 1st
+  list_filer = ('realtor',)
+  #shows a filter which allows us to view the listings by realtor
+  list_editable = ('is_published')
+  #this will show a checkbox for is_published that doesn't require us to go into the edit page
+  search_fields = ('title', 'description', 'address', 'city', 'state', 'price')
+  #this allows us to search according to these fields
+  list_perpage = 25
+  #only shows 25 items on the page and creates the pagination
+
+  def get_ordering(self, request):
+    return ['id']
+  #This sorts the entries in the ascending order wrt the id
+
+-------------------------------------------------------------------------------
+
+8. How to fetch the objects inside of our database ??
+--> (inside of the views.py of the listings where we render the html page on request)
+'''
+from .models import Listing
+(inside of the listings function)
+listings = Listing.objects.all()
+return render(request, 'listings/listings.html', {'listings':listings})
+'''
+---> To use these objects just loop through them
+
+-------------------------------------------------------------------------------
+
+9. We can also use django humanize (provides a whole lot of things)
+-> To use this we just need to add 'django.contrib.humanize' to the installed apps section of settings
+-> To use the functions inside of humanize we just need to load the humanize into the html of our site
+-> {% load humanize %}
+(to use this finally we just need a " | function_name")
+Eg. 580000 | intcomma => 580,000
+(COOL AF)
+
+-------------------------------------------------------------------------------
+
+10. We also need the paginator on the listings page to work. For this we use django paginator
+-> To use the paginator we need to add the following code to the index function of listings' views.py
+'''
+def index(request):
+    listings = Listing.objects.order_by('-list_date').filter(is_published=True)
+    #Instead of all() we use 'order_by' to order the listings and filter so that only the ones that are published are viewed
+
+    paginator = Paginator(listings, 6)
+    #defines that there will be only 6 listings on every page
+    page = request.GET.get('page')
+    #gets the page object
+    paged_listings = paginator.get_page(page)
+    #gets the pages for the paginator so that we can view 6 listings on every page
+    return render(request, 'listings/listings.html', {
+    'listings': paged_listings
+    })
+'''
+Q. But how do we implement this paginator into our HTML code ???
+-->
+'''
+<div class="row">
+  <div class="col-md-12">
+    {% if listings.has_other_pages %}
+    <ul class="pagination">
+      {% if listings.has_previous %}
+      <li class="page-item">
+        <a href="?page={{listings.previous_page_number}}" class="page-link">&laquo;</a>
+      </li>
+      {% else %}
+      <li class="page-item disabled">
+        <a class="page-link">&laquo;</a>
+      </li>
+      {% endif %}
+      {% for i in listings.paginator.page_range %}
+      {% if listings.number == i %}
+      <li class="page-item active">
+        <a class="page-link">{{i}}</a>
+      </li>
+      {% else %}
+      <li class="page-item">
+        <a href="?page={{i}}" class="page-link">{{i}}</a>
+      </li>
+      {% endif %}
+      {% endfor %}
+      {% if listings.has_next %}
+      <li class="page-item">
+        <a href="?page={{listings.next_page_number}}" class="page-link">&raquo;</a>
+      </li>
+      {% else %}
+      <li class="page-item disabled">
+        <a class="page-link">&raquo;</a>
+      </li>
+      {% endif %}
+    </ul>
+    {% endif %}
+  </div>
+</div>
+
+'''
+
+-------------------------------------------------------------------------------
