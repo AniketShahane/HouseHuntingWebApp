@@ -180,3 +180,74 @@ Q. But how do we implement this paginator into our HTML code ???
 '''
 
 -------------------------------------------------------------------------------
+
+11. Now how do we get specific listings from the listings page and show them on our listing.html
+->> Simple we go to the view.py of the listings folder and add the following code to the listing func
+'''
+(first import get_object_or_404 and the Listing model)
+
+listing = get_object_or_404(Listing, pk=listing_id)
+(just return this as a dictonary)
+
+'''
+
+-------------------------------------------------------------------------------
+
+12. For our search to work, we need to filter our list of objects according to the input that is given by the user through the form that is present in our search.html
+-> (inside the views.py of the listings, we need to add something to our search function)
+'''
+queryList = Listing.objects.order_by('-list_date')
+#this just gets all the objects of the Listing model
+#Now to filter this we need to check the values for the **names** of the inputs
+
+#keywords
+if 'keywords' in request.GET:
+  #if we submit our form after entering something in the keywords input the condition will be true
+  keywords = request.GET['keywords']
+  #this variable will store the value that we entered for our keywords input
+  if keywords:
+  #if there is something inside the keywords variable the condition will be true
+    queryList = queryList.filter(description__icontains=keywords)
+    #this will filter only if description of the property contains the keywords (i=>case insensitive)
+
+#city
+if 'city' in request.GET:
+  city = request.GET['city']
+  if city:
+    queryList = queryList.filter(city__iexact=city)
+    #this will only filter if the city name matches (iexact=>exact letters but case insensitive)
+
+#state
+if 'state' in request.GET:
+  state = request.GET['state']
+  if state:
+    queryList = queryList.filter(state__iexact=state)
+
+#bedrooms
+if 'bedrooms' in request.GET:
+  bedrooms = request.GET['bedrooms']
+  if bedrooms:
+    queryList = queryList.filter(bedrooms__lte=bedrooms)
+    #the lte in this case is less than equal to
+
+#price
+if 'price' in request.GET:
+  price = request.GET['price']
+  if price:
+    queryList = queryList.filter(price__lte=price)
+
+(finally when we return the render we also need to add the request.GET so that when we submit the form the values will still stay in their fields)
+return render(request, 'listings/search.html', {
+...
+...
+...
+'values':request.GET
+})
+'''
+--> The values that we returned in the previous case can then be used to set the values of the fields
+Eg. <input value="{{values.city}}"> --- This will set the value of the city field to city
+<option ... {% if state == values.state %} selected {% endif %}> --- Since we are dealing with select tag s
+
+-------------------------------------------------------------------------------
+
+13.
