@@ -338,3 +338,66 @@ Eg. <input value="{{values.city}}"> --- This will set the value of the city fiel
             <input type="hidden">
           </form>
       '''
+    4. To use dynamic page titles we can just use {% block title %} {% endblock %} inside of our title in the base.html
+
+    5. **** To get the alert messages what we have done is
+    --> We added the following code to the settings.py of main project. This is because django already supports the messages (django.contrib.messages)
+    '''
+
+    from django.contrib.messages import constants as messages
+    MESSAGE_TAGS = {
+        messages.ERROR: 'danger',
+    }
+
+    '''
+    --> We created a partial '_alerts.html'
+      '''
+      {% if messages %}
+      {% for message in messages %}
+      <div class="contianer" id="message">
+        <div class="alert alert-{{message.tags}} alert-dismissable text-center" role="alert">
+          <button class="close" type="button" data-dismiss="alert"><span aria-hidden="true"> &times;</span></button>
+          <strong>
+            {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+            Error:
+            {% else %}
+            {{ message.tags|title }}
+            {% endif %}
+          </strong>
+          {{message}}
+        </div>
+      </div>
+      {% endfor %}
+      {% endif %}
+
+      '''
+      --> To show an error we first have to create the error message
+      '''
+      # this will send a message to all the html files that have this code
+      ({% include 'partials/_alerts.html' %})
+      messages.error(request, 'Invalid Credentials')
+      '''
+
+-------------------------------------------------------------------------------
+
+14. To send an email in django (Very cool) we just have to add the following lines in the settings.py
+'''
+#Email Configuration
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'see.you.travels.00@gmail.com'
+EMAIL_HOST_PASSWORD = 'seeyou@321'
+EMAIL_USE_TLS = True
+'''
+--> Now to send the email we need to go into the views.py of the contacts and then just add the following lines
+'''
+from django.core.mail import send_mail
+send_mail(
+'subject',
+'body',
+'email from which we will be sending the mail',
+'[emailReceiver1, emailReceiver2...]'
+fail_silently=False
+)
+'''
+-------------------------------------------------------------------------------
